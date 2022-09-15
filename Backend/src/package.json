@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.2",
+    "mongodb": "^4.9.1",
+    "mongoose": "^6.6.0",
+    "morgan": "^1.10.0"
+  }
+}
