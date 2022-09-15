@@ -1,0 +1,13 @@
+{
+  "plugins": [
+    "@babel/plugin-proposal-class-properties",
+    [
+      "module-resolver",
+      {
+        "alias": {
+          "@icons": "./src/components/icons"
+        }
+      }
+    ]
+  ]
+}
