@@ -54,4 +54,5 @@ const validateBody = (body) => {
 
 module.exports = {
   validateBody,
+  validatePassword,
 };

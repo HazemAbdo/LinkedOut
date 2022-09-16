@@ -7,6 +7,7 @@ const config = require("dotenv");
 const v1UsersRouter = require("./routes/users");
 const v1ConnectionsRouter = require("./routes/connections");
 const v1PostsRouter = require("./routes/posts");
+const v1PasswordResetRouter = require("./routes/passwordReset");
 const { default: mongoose } = require("mongoose");
 
 config.config();
@@ -33,6 +34,7 @@ mongoose.connect(
 app.use("/api/v1/users", v1UsersRouter);
 app.use("/api/v1/connections", v1ConnectionsRouter);
 app.use("/api/v1/posts", v1PostsRouter);
+app.use("/api/v1/reset-password", v1PasswordResetRouter);
 
 app.listen(PORT, () => {
   console.log(`API is listening on port ${PORT}`);

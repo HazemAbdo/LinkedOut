@@ -1,11 +1,13 @@
 const bcrypt = require("bcrypt");
 const { ObjectId } = require("mongodb");
 const { sendResponse, createError } = require("../utils/respones");
-const { validateBody } = require("../utils/validations");
+const { validateBody, validatePassword } = require("../utils/validations");
+const { sendEmail } = require("../utils/sendEmail");
 const jwt = require("jsonwebtoken");
 const config = require("dotenv");
 
 const userService = require("../services/userService");
+const { InvalidToken } = require("../database/models/invalidTokens");
 
 config.config();
 
@@ -126,10 +128,93 @@ const logout = async (req, res) => {
   }
 };
 
+const sendPasswordResetEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    userService
+      .sendPasswordResetEmail(email)
+      .then((url) => {
+        sendEmail(
+          email,
+          "Password reset",
+          "Hello From LinkedOut, Here your password reset link,This link will expire in 10 minutes.Available only for one time use.",
+          url
+        )
+          .then((info) => {
+            sendResponse(res, 200, info);
+          })
+          .catch((err) => {
+            sendResponse(res, createError(err).status, createError(err).data);
+          });
+      })
+      .catch((err) => {
+        sendResponse(res, createError(err).status, createError(err).data);
+      });
+  } catch (err) {
+    sendResponse(res, createError(err).status, createError(err).data);
+  }
+};
+
+const passwordReset = async (req, res) => {
+  try {
+    const { userId, token } = req.params;
+    const { password } = req.body;
+
+    InvalidToken.findOne({ token: token }).then(async (invalidToken) => {
+      if (invalidToken) {
+        sendResponse(res, 400, { error: "Expired token" });
+      } else {
+        if (!validatePassword(password)) {
+          sendResponse(res, 400, {
+            error:
+              "Password must contain at least 8 characters, one uppercase letter, one lowercase letter and one number",
+          });
+          return;
+        }
+
+        let hash = await bcrypt.hash(password, 10);
+
+        userService
+          .passwordReset(userId, token, hash)
+          .then(async (data) => {
+            console.log(data);
+            await sendEmail(
+              data.email,
+              "Password reset",
+              "Hello From LinkedOut",
+              "Password reset successful"
+            );
+            InvalidToken.create({ token: token })
+
+              .then(() => {
+                sendResponse(res, 200, {
+                  message: "Password reset successful",
+                });
+              })
+              .catch((err) => {
+                sendResponse(
+                  res,
+                  createError(err).status,
+                  createError(err).data
+                );
+              });
+          })
+          .catch((err) => {
+            sendResponse(res, createError(err).status, createError(err).data);
+          });
+      }
+    });
+  } catch (err) {
+    sendResponse(res, createError(err).status, createError(err).data);
+  }
+};
+
 module.exports = {
   getUsers,
   getUser,
   createUser,
   loginUser,
   logout,
+  sendPasswordResetEmail,
+  passwordReset,
 };
