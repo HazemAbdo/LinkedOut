@@ -22,5 +22,9 @@
     "express-validator": "^6.14.2",
     "jsonwebtoken": "^8.5.1",
     "prettier": "^2.7.1"
+  },
+  "apidoc": {
+    "title": "Linked Out API Documentation",
+    "url": "http://localhost:3000/api/v1"
   }
 }

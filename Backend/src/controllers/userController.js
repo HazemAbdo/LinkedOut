@@ -68,7 +68,7 @@ const createUser = async (req, res) => {
           return;
         }
         data.token = token;
-        sendResponse(res, 200, { _id: data._id, token: token });
+        sendResponse(res, 201, { _id: data._id, token: token });
       })
       .catch((err) => {
         if (err.code == 11000) {
