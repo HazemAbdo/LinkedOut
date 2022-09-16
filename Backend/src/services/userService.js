@@ -82,10 +82,9 @@ const updateUser = async (id, update) => {
 };
 
 const logout = async (token) => {
-  console.log(token);
   return new Promise((resolve, reject) => {
     InvalidToken.create({ token })
-      .then((data) => {
+      .then(() => {
         client.close();
         resolve({ message: "Logged out successfully" });
       })

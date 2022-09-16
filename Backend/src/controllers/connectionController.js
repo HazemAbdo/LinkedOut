@@ -1,6 +1,5 @@
 const { sendResponse, createError } = require("../utils/respones");
 const connectionsService = require("../services/connectionsService");
-const userService = require("../services/userService");
 const { ObjectId } = require("mongodb");
 
 const connectRequest = async (req, res) => {

@@ -1,6 +1,5 @@
 const { client } = require("../database/database_connection");
 const { User } = require("../database/models/users");
-const { sendResponse } = require("../utils/respones");
 const userService = require("../services/userService");
 const { ObjectId } = require("mongodb");
 
@@ -91,8 +90,9 @@ const acceptRequest = async (requester_id, target_id) => {
                   reject(err);
                 });
             } else {
-              sendResponse(res, 500, {
-                error: "An Error Occured While Accepting Connection Request",
+              reject({
+                message:
+                  "An error occured while accepting the connection request",
               });
             }
           })
@@ -170,7 +170,7 @@ const removeConnection = async (requester_id, target_id) => {
       }
     )
       .exec()
-      .then((data) => {
+      .then(() => {
         User.updateOne(
           { _id: ObjectId(target_id) },
           {

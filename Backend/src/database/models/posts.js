@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { commentsSchema } = require("./comments");
+const { reactionSchema } = require("./reactions");
 const { sharesSchema } = require("./shares");
 const Schema = mongoose.Schema;
 
@@ -16,14 +17,20 @@ const postSchema = new Schema({
     type: String,
     required: true,
   },
-  likes: {
-    type: [String],
+  reactions: {
+    type: [reactionSchema],
   },
   comments: {
     type: [commentsSchema],
   },
   shares: {
     type: [sharesSchema],
+  },
+  created_from: {
+    type: Object,
+  },
+  user: {
+    type: Object,
   },
 });
 

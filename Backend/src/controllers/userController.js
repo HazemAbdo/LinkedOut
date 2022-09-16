@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const { ObjectId } = require("mongodb");
 const { sendResponse, createError } = require("../utils/respones");
-const { checkRequired, validateBody } = require("../utils/validations");
+const { validateBody } = require("../utils/validations");
 const jwt = require("jsonwebtoken");
 const config = require("dotenv");
 
