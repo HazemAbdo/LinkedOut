@@ -1,18 +1,21 @@
 const { sendResponse, createError } = require("../utils/respones");
-const postsService = require("../services/postsService");
+const commentsService = require("../services/commentsService");
 const { ObjectId } = require("mongodb");
 
-const createPost = async (req, res) => {
+const commentPost = async (req, res) => {
   try {
-    const { body } = req;
+    const { id } = req.params;
     const user_id = req.user._id; // id of the user making the request
+    const { comment } = req.body;
     if (user_id == null) {
       sendResponse(res, 400, "User id is required");
     }
-    body.user_id = ObjectId(user_id);
-    body.date_posted = new Date();
-    postsService
-      .createPost(body)
+    commentsService
+      .commentPost(id, {
+        user_id: user_id,
+        comment: comment,
+        date_commented: new Date(),
+      })
       .then((result) => {
         sendResponse(res, 200, result);
       })
@@ -24,30 +27,17 @@ const createPost = async (req, res) => {
   }
 };
 
-const getPostsById = async (req, res) => {
+const removeCommentPost = async (req, res) => {
   try {
-    const { id } = req.params;
-    postsService
-      .getPostsById(id)
-      .then((data) => {
-        sendResponse(res, 200, data);
-      })
-      .catch((err) => {
-        console.log(err);
-        sendResponse(res, createError(err).status, createError(err).data);
-      });
-  } catch (err) {
-    sendResponse(res, createError(err).status, createError(err).data);
-  }
-};
-
-const getPostsInfiniteScroll = async (req, res) => {
-  try {
-    const { page } = req.query;
-    postsService
-      .getPosts(page)
-      .then((data) => {
-        sendResponse(res, 200, data);
+    const { post_id, comment_id } = req.params;
+    const user_id = req.user._id; // id of the user making the request
+    if (user_id == null) {
+      sendResponse(res, 400, "User id is required");
+    }
+    commentsService
+      .removeCommentPost(post_id, comment_id, user_id)
+      .then((result) => {
+        sendResponse(res, 200, result);
       })
       .catch((err) => {
         sendResponse(res, createError(err).status, createError(err).data);
@@ -57,16 +47,19 @@ const getPostsInfiniteScroll = async (req, res) => {
   }
 };
 
-const reactPost = async (req, res) => {
+const reactToComment = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { post_id, comment_id } = req.params;
     const user_id = req.user._id; // id of the user making the request
     const { reaction } = req.body;
     if (user_id == null) {
       sendResponse(res, 400, "User id is required");
     }
-    postsService
-      .reactPost(id, { user_id, reaction })
+    commentsService
+      .reactToComment(post_id, ObjectId(comment_id), {
+        user_id: user_id,
+        reaction: reaction,
+      })
       .then((result) => {
         sendResponse(res, 200, result);
       })
@@ -78,15 +71,15 @@ const reactPost = async (req, res) => {
   }
 };
 
-const unreactPost = async (req, res) => {
+const unreactToComment = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { post_id, comment_id } = req.params;
     const user_id = req.user._id; // id of the user making the request
     if (user_id == null) {
       sendResponse(res, 400, "User id is required");
     }
-    postsService
-      .unreactPost(id, user_id)
+    commentsService
+      .unreactToComment(post_id, ObjectId(comment_id), user_id)
       .then((result) => {
         sendResponse(res, 200, result);
       })
@@ -99,9 +92,8 @@ const unreactPost = async (req, res) => {
 };
 
 module.exports = {
-  getPostsById,
-  createPost,
-  getPostsInfiniteScroll,
-  reactPost,
-  unreactPost,
+  commentPost,
+  removeCommentPost,
+  reactToComment,
+  unreactToComment,
 };

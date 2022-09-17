@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { reactionSchema } = require("./reactions");
 const { repliesSchema } = require("./replies");
 const Schema = mongoose.Schema;
 
@@ -18,8 +19,8 @@ const commentsSchema = new Schema({
   replies: {
     type: [repliesSchema],
   },
-  likes: {
-    type: [String],
+  reactions: {
+    type: [reactionSchema],
   },
 });
 
