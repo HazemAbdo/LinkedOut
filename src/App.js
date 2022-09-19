@@ -1,13 +1,12 @@
 import { render } from "react-dom";
 
-import LogoComponent from "./components/Logo/index";
-//TODO: where to set routes
-LogoComponent;
+import SignUpComponent from "./feature/SignUp";
+
+SignUpComponent;
 const App = () => {
   return (
     <>
-      <LogoComponent type="withText" />
-      <LogoComponent type="withoutText" />
+      <SignUpComponent />
     </>
   );
 };

@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint \"src/**/*.{js,jsx}\" --quiet",
     "fix": "eslint \"src/**/*.{js,jsx}\" --fix",
-    "dev": "parcel src/index.html"
+    "dev": "parcel public/index.html"
   },
   "repository": {
     "type": "git",
