@@ -12,8 +12,6 @@ const connectionSchema = new Schema({
   },
 });
 
-const connectionModel = mongoose.model("Connection", connectionSchema);
 module.exports = {
-  connectionModel,
   connectionSchema,
 };

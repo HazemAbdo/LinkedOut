@@ -4,15 +4,16 @@ const { ObjectId } = require("mongodb");
 
 const commentPost = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { post_id } = req.params;
     const user_id = req.user._id; // id of the user making the request
     const { comment } = req.body;
     if (user_id == null) {
       sendResponse(res, 400, "User id is required");
     }
     commentsService
-      .commentPost(id, {
-        user_id: user_id,
+      .commentPost({
+        user_id: ObjectId(user_id),
+        post_id: post_id,
         comment: comment,
         date_commented: new Date(),
       })
@@ -29,13 +30,13 @@ const commentPost = async (req, res) => {
 
 const removeCommentPost = async (req, res) => {
   try {
-    const { post_id, comment_id } = req.params;
+    const { comment_id } = req.params;
     const user_id = req.user._id; // id of the user making the request
     if (user_id == null) {
       sendResponse(res, 400, "User id is required");
     }
     commentsService
-      .removeCommentPost(post_id, comment_id, user_id)
+      .removeCommentPost(comment_id, ObjectId(user_id))
       .then((result) => {
         sendResponse(res, 200, result);
       })
@@ -49,15 +50,15 @@ const removeCommentPost = async (req, res) => {
 
 const reactToComment = async (req, res) => {
   try {
-    const { post_id, comment_id } = req.params;
+    const { comment_id } = req.params;
     const user_id = req.user._id; // id of the user making the request
     const { reaction } = req.body;
     if (user_id == null) {
       sendResponse(res, 400, "User id is required");
     }
     commentsService
-      .reactToComment(post_id, ObjectId(comment_id), {
-        user_id: user_id,
+      .reactToComment(ObjectId(comment_id), {
+        user_id: ObjectId(user_id),
         reaction: reaction,
       })
       .then((result) => {
@@ -73,13 +74,13 @@ const reactToComment = async (req, res) => {
 
 const unreactToComment = async (req, res) => {
   try {
-    const { post_id, comment_id } = req.params;
+    const { comment_id } = req.params;
     const user_id = req.user._id; // id of the user making the request
     if (user_id == null) {
       sendResponse(res, 400, "User id is required");
     }
     commentsService
-      .unreactToComment(post_id, ObjectId(comment_id), user_id)
+      .unreactToComment(ObjectId(comment_id), ObjectId(user_id))
       .then((result) => {
         sendResponse(res, 200, result);
       })

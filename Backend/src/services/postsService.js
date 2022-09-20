@@ -2,6 +2,7 @@ const { Post } = require("../database/models/posts");
 const { client } = require("../database/database_connection");
 const { User } = require("../database/models/users");
 const config = require("dotenv");
+const { Comment } = require("../database/models/comments");
 
 config.config();
 
@@ -21,33 +22,58 @@ const createPost = async (data) => {
 
 const getPostsById = async (id) => {
   return new Promise((resolve, reject) => {
-    Post.find({ user_id: id })
-      .transform(async (doc, ret) => {
-        ret = {
-          posts: doc,
-        };
-        let user = await User.findOne({ _id: id }).select(
-          "username experience.profile_headline profile_picture"
+    getUserPosts(id)
+      .then(async (data) => {
+        let posts = data;
+        posts = await Promise.all(
+          posts.map(async (post) => {
+            let comments_count = await Comment.countDocuments({
+              post_id: post._id,
+            });
+            post.comments_count = comments_count;
+            return post;
+          })
         );
-        ret.user = user;
-        let created_from = ret.posts.map((post) => {
-          let dateDiff = new Date() - post.date_posted;
-          return {
-            seconds: Math.floor(dateDiff / 1000),
-            minutes: Math.floor(dateDiff / 60000),
-            hours: Math.floor(dateDiff / 3600000),
-            days: Math.floor(dateDiff / 86400000),
-            weeks: Math.floor(dateDiff / 604800000),
-            months: Math.floor(dateDiff / 2592000000),
-            years: Math.floor(dateDiff / 31536000000),
-          };
-        });
+        resolve(posts);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
 
-        ret.posts.forEach((post, index) => {
-          post.created_from = created_from[index];
-        });
-
-        resolve(ret);
+const getUserPosts = async (id) => {
+  return new Promise((resolve, reject) => {
+    Post.aggregate([
+      {
+        $match: {
+          user_id: id,
+        },
+      },
+      {
+        $addFields: {
+          created_from: {
+            $dateToParts: {
+              date: "$date_posted",
+            },
+          },
+          shares_count: {
+            $size: "$shares",
+          },
+          reactions_count: {
+            $size: "$reactions",
+          },
+        },
+      },
+      {
+        $sort: {
+          date_posted: -1,
+        },
+      },
+    ])
+      .then((post) => {
+        client.close();
+        resolve(post);
       })
       .catch((err) => {
         client.close();
@@ -91,6 +117,8 @@ const getPostsInfiniteScroll = async (page, PAGE_SIZE = 2) => {
         } else {
           ret.next_url = `${process.env.URL}/posts?page=${+page + 1}`;
         }
+
+        // count comments for each post
 
         resolve(ret);
       })
@@ -179,12 +207,10 @@ const unreactPost = async (id, user_id) => {
   });
 };
 
-
 module.exports = {
   getPostsById,
   createPost,
   getPosts,
   reactPost,
   unreactPost,
-
 };

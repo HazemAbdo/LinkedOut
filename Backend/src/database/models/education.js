@@ -36,8 +36,6 @@ const educationSchema = new Schema({
   },
 });
 
-const Education = mongoose.model("Education", educationSchema);
 module.exports = {
-  Education,
   educationSchema,
 };

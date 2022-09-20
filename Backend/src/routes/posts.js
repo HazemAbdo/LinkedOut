@@ -1,7 +1,6 @@
 let express = require("express");
 let router = express.Router();
 const postsController = require("../controllers/postsController");
-const commentController = require("../controllers/commentsController");
 const { verifyToken } = require("../middlewares/auth");
 
 /**
@@ -228,25 +227,5 @@ router.post("/:id/react", verifyToken, postsController.reactPost);
  */
 
 router.post("/:id/unreact", verifyToken, postsController.unreactPost);
-
-router.post("/:id/comment", verifyToken, commentController.commentPost);
-
-router.delete(
-  "/:post_id/comment/:comment_id",
-  verifyToken,
-  commentController.removeCommentPost
-);
-
-router.post(
-  "/:post_id/comment/:comment_id/react",
-  verifyToken,
-  commentController.reactToComment
-);
-
-router.delete(
-  "/:post_id/comment/:comment_id/unreact",
-  verifyToken,
-  commentController.unreactToComment
-);
 
 module.exports = router;

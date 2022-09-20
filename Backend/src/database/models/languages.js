@@ -12,8 +12,6 @@ const languageSchema = new Schema({
   },
 });
 
-const Language = mongoose.model("Language", languageSchema);
 module.exports = {
-  Language,
   languageSchema,
 };

@@ -25,8 +25,6 @@ const jobPreferencesSchema = new Schema({
   },
 });
 
-const JobPreferences = mongoose.model("JobPreferences", jobPreferencesSchema);
 module.exports = {
-  JobPreferences,
   jobPreferencesSchema,
 };

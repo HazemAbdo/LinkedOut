@@ -8,6 +8,10 @@ const commentsSchema = new Schema({
     type: String,
     required: true,
   },
+  post_id: {
+    type: String,
+    required: true,
+  },
   date_commented: {
     type: Date,
     required: true,
@@ -22,8 +26,14 @@ const commentsSchema = new Schema({
   reactions: {
     type: [reactionSchema],
   },
+  user: {
+    type: Object,
+  },
 });
 
+const Comment = mongoose.model("Comment", commentsSchema);
+
 module.exports = {
+  Comment,
   commentsSchema,
 };

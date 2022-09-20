@@ -12,8 +12,6 @@ const featuredSchema = new Schema({
   },
 });
 
-const Featured = mongoose.model("Featured", featuredSchema);
 module.exports = {
-  Featured,
   featuredSchema,
 };

@@ -1,71 +1,15 @@
-const { Post } = require("../database/models/posts");
+const { Comment } = require("../database/models/comments");
 
-const commentPost = async (id, update) => {
+const commentPost = async (comment) => {
   return new Promise((resolve, reject) => {
-    Post.updateOne({ _id: id }, { $push: { comments: update } })
-      .then(() => {
-        resolve({
-          message: "Comment to post successfully",
-        });
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-};
-
-const removeCommentPost = async (id, comment_id, user_id) => {
-  return new Promise((resolve, reject) => {
-    Post.updateOne(
-      { _id: id },
-      { $pull: { comments: { _id: comment_id, user_id: user_id } } }
-    )
-      .then(() => {
-        resolve({
-          message: "Remove comment from post successfully",
-        });
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-};
-
-const reactToComment = async (id, comment_id, update) => {
-  return new Promise((resolve, reject) => {
-    Post.findOne({
-      _id: id,
-      "comments._id": comment_id,
-      "comments.reactions.user_id": update.user_id,
+    Comment.create({
+      user_id: comment.user_id,
+      post_id: comment.post_id,
+      date_commented: comment.date_commented,
+      comment: comment.comment,
     })
-      .then(async (post) => {
-        if (post == null) {
-          Post.updateOne(
-            { _id: id, "comments._id": comment_id },
-            { $push: { "comments.$.reactions": update } }
-          )
-            .then(async () => {
-              resolve({
-                message: "React to comment successfully",
-              });
-            })
-            .catch((err) => {
-              reject(err);
-            });
-        } else {
-          let comment = post.comments.find(
-            (comment) => comment._id.toString() == comment_id.toString()
-          );
-          let reaction = comment.reactions.find(
-            (reaction) => reaction.user_id == update.user_id
-          );
-          reaction.reaction = update.reaction;
-
-          await post.save();
-          resolve({
-            message: "Update React to comment successfully",
-          });
-        }
+      .then((comment) => {
+        resolve(comment);
       })
       .catch((err) => {
         reject(err);
@@ -73,16 +17,86 @@ const reactToComment = async (id, comment_id, update) => {
   });
 };
 
-const unreactToComment = async (id, comment_id, user_id) => {
+const removeCommentPost = async (comment_id, user_id) => {
   return new Promise((resolve, reject) => {
-    Post.updateOne(
-      { _id: id, "comments._id": comment_id },
-      { $pull: { "comments.$.reactions": { user_id: user_id } } }
+    Comment.deleteOne({
+      _id: comment_id,
+      user_id: user_id,
+    })
+      .then((result) => {
+        resolve(result);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
+
+const reactToComment = async (comment_id, update) => {
+  return new Promise((resolve, reject) => {
+    Comment.findOne({
+      _id: comment_id,
+      "reactions.user_id": update.user_id,
+    }).then((result) => {
+      if (result) {
+        Comment.updateOne(
+          {
+            _id: comment_id,
+            "reactions.user_id": update.user_id,
+          },
+          {
+            $set: {
+              "reactions.$.reaction": update.reaction,
+            },
+          }
+        )
+          .then((result) => {
+            resolve(result);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      } else {
+        Comment.updateOne(
+          {
+            _id: comment_id,
+          },
+          {
+            $push: {
+              reactions: {
+                user_id: update.user_id,
+                reaction: update.reaction,
+              },
+            },
+          }
+        )
+          .then((result) => {
+            resolve(result);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      }
+    });
+  });
+};
+
+const unreactToComment = async (comment_id, user_id) => {
+  return new Promise((resolve, reject) => {
+    Comment.updateOne(
+      {
+        _id: comment_id,
+      },
+      {
+        $pull: {
+          reactions: {
+            user_id: user_id,
+          },
+        },
+      }
     )
-      .then(() => {
-        resolve({
-          message: "Unreact to comment successfully",
-        });
+      .then((result) => {
+        resolve(result);
       })
       .catch((err) => {
         reject(err);

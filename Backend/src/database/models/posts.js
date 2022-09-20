@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { commentsSchema } = require("./comments");
 const { reactionSchema } = require("./reactions");
 const { sharesSchema } = require("./shares");
 const Schema = mongoose.Schema;
@@ -20,16 +19,14 @@ const postSchema = new Schema({
   reactions: {
     type: [reactionSchema],
   },
-  comments: {
-    type: [commentsSchema],
+  comments_count: {
+    type: Number,
+    default: 0,
   },
   shares: {
     type: [sharesSchema],
   },
   created_from: {
-    type: Object,
-  },
-  user: {
     type: Object,
   },
 });
