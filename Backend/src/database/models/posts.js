@@ -23,6 +23,12 @@ const postSchema = new Schema({
     type: Number,
     default: 0,
   },
+  shares_count: {
+    type: Number,
+  },
+  reactions_count: {
+    type: Number,
+  },
   shares: {
     type: [sharesSchema],
   },

@@ -92,9 +92,43 @@ const unreactToComment = async (req, res) => {
   }
 };
 
+const getPostComments = async (req, res) => {
+  try {
+    const { post_id } = req.params;
+    commentsService
+      .getPostComments(post_id)
+      .then((result) => {
+        sendResponse(res, 200, result);
+      })
+      .catch((err) => {
+        sendResponse(res, createError(err).status, createError(err).data);
+      });
+  } catch (err) {
+    sendResponse(res, createError(err).status, createError(err).data);
+  }
+};
+
+const getCommentReactions = async (req, res) => {
+  try {
+    const { comment_id } = req.params;
+    commentsService
+      .getCommentReactions(ObjectId(comment_id))
+      .then((result) => {
+        sendResponse(res, 200, result);
+      })
+      .catch((err) => {
+        sendResponse(res, createError(err).status, createError(err).data);
+      });
+  } catch (err) {
+    sendResponse(res, createError(err).status, createError(err).data);
+  }
+};
+
 module.exports = {
   commentPost,
   removeCommentPost,
   reactToComment,
   unreactToComment,
+  getPostComments,
+  getCommentReactions,
 };

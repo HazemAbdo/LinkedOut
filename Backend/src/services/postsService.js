@@ -3,6 +3,7 @@ const { client } = require("../database/database_connection");
 const { User } = require("../database/models/users");
 const config = require("dotenv");
 const { Comment } = require("../database/models/comments");
+const { ObjectId } = require("mongodb");
 
 config.config();
 
@@ -106,8 +107,14 @@ const getPostsInfiniteScroll = async (page, PAGE_SIZE = 2) => {
           };
         });
 
-        ret.posts.forEach((post, index) => {
+        ret.posts.forEach(async (post, index) => {
           post.created_from = created_from[index];
+          post.shares_count = post.shares.length;
+          post.reactions_count = post.reactions.length;
+          let comments_count = await Comment.countDocuments({
+            post_id: ObjectId(post._id),
+          });
+          post.comments_count = comments_count;
         });
 
         ret.current_page = page;
@@ -117,8 +124,6 @@ const getPostsInfiniteScroll = async (page, PAGE_SIZE = 2) => {
         } else {
           ret.next_url = `${process.env.URL}/posts?page=${+page + 1}`;
         }
-
-        // count comments for each post
 
         resolve(ret);
       })
