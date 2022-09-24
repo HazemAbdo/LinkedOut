@@ -120,6 +120,11 @@ const getPostComments = async (post_id) => {
           user_id_string: {
             $toObjectId: "$user_id",
           },
+          created_from: {
+            $dateToParts: {
+              date: "$date_commented",
+            },
+          },
         },
       },
       {

@@ -3,6 +3,7 @@ const { certificateSchema } = require("./certificates");
 const { connectionSchema } = require("./connections");
 const { educationSchema } = require("./education");
 const { experienceSchema } = require("./experience");
+const { featuredSchema } = require("./featured");
 const { jobPreferencesSchema } = require("./job_preferences");
 const { languageSchema } = require("./languages");
 const { projectSchema } = require("./projects");
@@ -78,6 +79,9 @@ const userSchema = new Schema({
   },
   education: {
     type: [educationSchema],
+  },
+  featured: {
+    type: [featuredSchema],
   },
 });
 

@@ -35,6 +35,9 @@ const postSchema = new Schema({
   created_from: {
     type: Object,
   },
+  reaction_types: {
+    type: Array,
+  },
 });
 
 const Post = mongoose.model("Post", postSchema);

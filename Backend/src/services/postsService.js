@@ -118,6 +118,13 @@ const getPostsInfiniteScroll = async (page, PAGE_SIZE = 2) => {
         });
 
         ret.current_page = page;
+        let reactionSet = new Set();
+        ret.posts.forEach((post) => {
+          post.reactions.forEach(({ reaction }) => {
+            reactionSet.add(reaction);
+          });
+          post.reaction_types = [...reactionSet];
+        });
 
         if (ret.posts.length < PAGE_SIZE) {
           ret.next_url = null;
